@@ -7,18 +7,31 @@ import { Filter } from 'components/Filter/Filter';
 export class Phonebook extends Component {
   state = {
     contacts: [
-      //   { id: 'RBQlqNROoK', name: 'Bruce Wayne', number: '+380501112233' },
-      //   { id: '5heOS5ugIX', name: 'Clark Kent', number: '+380507511515' },
-      //   { id: 'sku_zwg5AC', name: 'Lex Luthor', number: '+380961512535' },
+      // { id: 'RBQlqNROoK', name: 'Bruce Wayne', number: '+380501112233' },
+      // { id: '5heOS5ugIX', name: 'Clark Kent', number: '+380507511515' },
+      // { id: 'sku_zwg5AC', name: 'Lex Luthor', number: '+380961512535' },
     ],
     filter: '',
   };
+
+  componentDidMount() {
+    if (localStorage.getItem(`contacts`)?.length > 0) {
+      this.setState({ contacts: JSON.parse(localStorage.getItem(`contacts`)) });
+    }
+  }
+
+  componentDidUpdate(_, prevState) {
+    if (
+      JSON.stringify(prevState.contacts) !== JSON.stringify(this.state.contacts)
+    ) {
+      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+    }
+  }
 
   handleInputChange = event => {
     const { name, value } = event.target;
     this.setState({ [name]: value });
   };
-
   addContact = (newName, newNumber) => {
     if (this.preventDublicate(newNumber)) {
       return window.alert(`Number is already saved`);
@@ -26,7 +39,6 @@ export class Phonebook extends Component {
     this.setState(prevState => {
       const { contacts } = prevState;
       const newContact = { id: nanoid(10), name: newName, number: newNumber };
-
       return { contacts: [...contacts, newContact] };
     });
   };
